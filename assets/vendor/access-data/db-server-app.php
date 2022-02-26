@@ -111,6 +111,87 @@
         $pdo=null;
     }
 
+    function UpdateUser(){
+        $nam=$_POST['firstName'];
+        $last=$_POST['lastName'];
+        $mail=$_POST['email'];
+        $code=$_SESSION['user'];
+        $flag=0;
+        $pdo=cnx_db_restaurant();
+        $sql="update employee_restaurant set name_employee='$nam', lastname_employee='$last', email_employee='$mail' where id_employee=$code";
+        $result=$pdo->prepare($sql);
+        $flag=$result->execute();
+        if($flag==1){
+            $pdo=null;
+            $pdo=cnx_db_restaurant();
+            $contador=0;
+            $sql="SELECT name_employee, lastname_employee, email_employee FROM employee_restaurant WHERE id_employee=:user";
+            $result=$pdo->prepare($sql);
+            $result->execute(array(":user"=>$code));
+            while ($row=$result->fetch(PDO::FETCH_ASSOC)) {
+                $_SESSION['name']=$row['name_employee'];
+                $_SESSION['lastname']=$row['lastname_employee'];
+                $_SESSION['emailuser']=$row['email_employee'];
+            }
+            return 1;
+        }else{
+            return 0;
+        }
+    }
+
+    function ValidatePassword($user){
+        $pdo=cnx_db_restaurant();
+        $contador=0;
+        $hash="";
+        $sql="SELECT password_employee FROM employee_restaurant WHERE id_employee=:user";
+        $result=$pdo->prepare($sql);
+        $result->execute(array(":user"=>$user));
+        while ($row=$result->fetch(PDO::FETCH_ASSOC)) {
+            $contador++;
+            $hash=$row['password_employee'];
+        }
+        $result->closeCursor();
+        $pdo=null;
+        if($contador>0){
+            return $hash;
+        }else{
+            return null;
+        }
+    }
+
+    function UpdatePassword(){
+        $password=$_POST['pass'];
+        $newpassword=$_POST['newpass'];
+        $renewpassword=$_POST['renewpass'];
+        $user=$_SESSION['user'];
+        if(($password!=null||$password!="")&&($newpassword!=null||$newpassword!="")&&($renewpassword!=null||$renewpassword!="")){
+            if(password_verify($password,ValidatePassword($user))){
+                if($newpassword==$renewpassword){
+                    $nam=password_hash($newpassword,PASSWORD_DEFAULT);
+                    $flag=0;
+                    $pdo=cnx_db_restaurant();
+                    $sql="update employee_restaurant set password_employee='$nam' where id_employee=$user";
+                    $result=$pdo->prepare($sql);
+                    $flag=$result->execute();
+                    if($flag==1){
+                        session_start();
+                        session_destroy();
+                        return 4;
+                        die();
+                    }else{
+                        return 3;
+                    }
+                }else{
+                    return 2;
+                }
+            }else{
+                return 1;
+            }
+        }else{
+            return 0;
+        }
+    }
+
     $typeAction=$_POST['type'];
     $typeTime="today";
     if($_POST['timer']!=null){
@@ -121,6 +202,8 @@
         case "sale": echo SalesForTypeTime($typeTime); break;
         case "order": echo OrdersForTypeTime($typeTime); break;
         case "search": echo SearchUser(intval($typeTime)); break;
+        case "update": echo UpdateUser(); break;
+        case "uptpass": echo UpdatePassword(); break;
     }
 
 ?>

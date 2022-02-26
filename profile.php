@@ -233,7 +233,7 @@
                   <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
   
                     <!-- Profile Edit Form -->
-                    <form>
+                    <form role="form" id="formUpdateUser" autocomplete="off" method="post">
                       <div class="row mb-3">
                         <label for="firstName" class="col-md-4 col-lg-3 col-form-label">Nombres</label>
                         <div class="col-md-8 col-lg-9">
@@ -267,8 +267,7 @@
   
                   <div class="tab-pane fade pt-3" id="profile-change-password">
                     <!-- Change Password Form -->
-                    <form>
-  
+                    <form role="form" id="formUpdatePassUser" autocomplete="off" method="post">
                       <div class="row mb-3">
                         <label for="currentPassword" class="col-md-4 col-lg-3 col-form-label">Contraseña Actual</label>
                         <div class="col-md-8 col-lg-9">

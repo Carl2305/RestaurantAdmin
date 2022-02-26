@@ -1,9 +1,3 @@
-/**
-* Template Name: NiceAdmin - v2.2.2
-* Template URL: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/
-* Author: BootstrapMade.com
-* License: https://bootstrapmade.com/license/
-*/
 
 /**
    * Easy selector helper function
@@ -441,27 +435,27 @@ const loadDataServerPageHome = () => {
      xhr.open('POST','http://localhost/RestaurantAdmin/assets/vendor/access-data/db-show-detail-order.php');
      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded")
      xhr.onload = () => {
-         let response=xhr.responseText;
-         if(JSON.parse(response).length>0){
-         let obj_head_sale={};
-         data_sales_type.forEach(function(item,index){
-             if(item.id_order==code){
-             obj_head_sale={
-                 datetime_order: item.datetime_order,
-                 id_order: item.id_order,
-                 name_client: item.name_client,
-                 phone_client: item.phone_client,
-                 total_order: new Intl.NumberFormat("es-PE",{style: "currency", currency: "PEN"}).format(item.total_order),
-                 address_client: item.address_client,
-                 reference_address_client: item.reference_address_client,
-                 status_order: item.status_order
-             };
-             }
-         });
-         let obj_body_sale=JSON.parse(response);
-         let codeHtmlModal="";
-         obj_body_sale.forEach(function(item,index){
-             codeHtmlModal+=`<div class="col-12 row border border-primary mb-1">
+      let response=xhr.responseText;
+      if(JSON.parse(response).length>0){
+        let obj_head_sale={};
+        data_sales_type.forEach(function(item,index){
+          if(item.id_order==code){
+            obj_head_sale={
+              datetime_order: item.datetime_order,
+              id_order: item.id_order,
+              name_client: item.name_client,
+              phone_client: item.phone_client,
+              total_order: new Intl.NumberFormat("es-PE",{style: "currency", currency: "PEN"}).format(item.total_order),
+              address_client: item.address_client,
+              reference_address_client: item.reference_address_client,
+              status_order: item.status_order
+            };
+          }
+        });
+        let obj_body_sale=JSON.parse(response);
+        let codeHtmlModal="";
+        obj_body_sale.forEach(function(item,index){
+            codeHtmlModal+=`<div class="col-12 row border border-primary mb-1">
              <div class="col-4">
              <div class="d-flex justify-content-center">
                  <img src="${item.url_image_dish}" alt="coca cola 1.5Lt" class="w-50">
@@ -476,20 +470,26 @@ const loadDataServerPageHome = () => {
              <p>Comentario: <span>${item.comment_dish}</span></p>
              </div>
          </div>`;
-         });
-         modal_detail_order.show();
+        });
+        modal_detail_order.show();
  
-         select('#modal-detail-order h3 span').textContent=obj_head_sale.id_order;
-         select('#modal-detail-order p').textContent=obj_head_sale.datetime_order;
-         select('#modal-detail-order h2 span').textContent=obj_head_sale.total_order;
+        select('#modal-detail-order h3 span').textContent=obj_head_sale.id_order;
+        select('#modal-detail-order p').textContent=obj_head_sale.datetime_order;
+        select('#modal-detail-order h2 span').textContent=obj_head_sale.total_order;
  
-         select('#modal-detail-order #order-name-client').textContent=obj_head_sale.name_client;
-         select('#modal-detail-order #order-phone-client').textContent=obj_head_sale.phone_client;
-         select('#modal-detail-order #order-address-client').textContent=obj_head_sale.address_client;
-         select('#modal-detail-order #order-reference-client').textContent=obj_head_sale.reference_address_client;
+        select('#modal-detail-order #order-name-client').textContent=obj_head_sale.name_client;
+        select('#modal-detail-order #order-phone-client').textContent=obj_head_sale.phone_client;
+        select('#modal-detail-order #order-address-client').textContent=obj_head_sale.address_client;
+        select('#modal-detail-order #order-reference-client').textContent=obj_head_sale.reference_address_client;
          
-         select('#modal-detail-order .modal-body #detail-order').innerHTML=codeHtmlModal;
-         }
+        select('#modal-detail-order .modal-body #detail-order').innerHTML=codeHtmlModal;
+      }else{
+        Swal.fire({
+          title:'Error',
+          text:'Este pedido no tiene platos solicitados',
+          icon:'error'
+        });
+      }
      }
      xhr.send(`code_order=${code}`);
    } catch (e) {console.error(e.message);}
@@ -603,49 +603,55 @@ const showDetailOrderPage=code=>{
     xhr.onload = () => {
       let response=xhr.responseText;
       if(JSON.parse(response).length>0){
-      let obj_head_sale={};
-      data_orders_orders.forEach(function(item,index){
-        if(item.id_order==code){
-          obj_head_sale={
-            datetime_order: item.datetime_order,
-            id_order: item.id_order,
-            name_client: item.name_client,
-            phone_client: item.phone_client,
-            total_order: new Intl.NumberFormat("es-PE",{style: "currency", currency: "PEN"}).format(item.total_order),
-            address_client: item.address_client,
-            reference_address_client: item.reference_address_client,
-            status_order: item.status_order
-          };
-        }
-      });
-      let obj_body_sale=JSON.parse(response);
-      let codeHtmlModal="";
-      obj_body_sale.forEach(function(item,index){
-        codeHtmlModal+=`<div class="col-12 row border border-primary mb-1">
-          <div class="col-4">
-          <div class="d-flex justify-content-center">
-              <img src="${item.url_image_dish}" alt="coca cola 1.5Lt" class="w-50">
-          </div>
-          </div>
-          <div class="col-8">
-          <div class="col-12 d-flex justify-content-between">
-              <p>Producto: <span>${item.name_dish}</span></p>
-              <p>Precio: <span>${new Intl.NumberFormat("es-PE",{style: "currency", currency: "PEN"}).format(item.price_dish)}</span></p>
-          </div>
-          <p>Descripción: <span>${item.description_dish}</span></p>
-          <p>Comentario: <span>${item.comment_dish}</span></p>
-          </div>
-      </div>`;
-      });
-      modal_detail_order.show();
-      select('#modal-detail-order h3 span').textContent=obj_head_sale.id_order;
-      select('#modal-detail-order p').textContent=obj_head_sale.datetime_order;
-      select('#modal-detail-order h2 span').textContent=obj_head_sale.total_order;
-      select('#modal-detail-order #order-name-client').textContent=obj_head_sale.name_client;
-      select('#modal-detail-order #order-phone-client').textContent=obj_head_sale.phone_client;
-      select('#modal-detail-order #order-address-client').textContent=obj_head_sale.address_client;
-      select('#modal-detail-order #order-reference-client').textContent=obj_head_sale.reference_address_client; 
-      select('#modal-detail-order .modal-body #detail-order').innerHTML=codeHtmlModal;
+        let obj_head_sale={};
+        data_orders_orders.forEach(function(item,index){
+          if(item.id_order==code){
+            obj_head_sale={
+              datetime_order: item.datetime_order,
+              id_order: item.id_order,
+              name_client: item.name_client,
+              phone_client: item.phone_client,
+              total_order: new Intl.NumberFormat("es-PE",{style: "currency", currency: "PEN"}).format(item.total_order),
+              address_client: item.address_client,
+              reference_address_client: item.reference_address_client,
+              status_order: item.status_order
+            };
+          }
+        });
+        let obj_body_sale=JSON.parse(response);
+        let codeHtmlModal="";
+        obj_body_sale.forEach(function(item,index){
+          codeHtmlModal+=`<div class="col-12 row border border-primary mb-1">
+            <div class="col-4">
+            <div class="d-flex justify-content-center">
+                <img src="${item.url_image_dish}" alt="coca cola 1.5Lt" class="w-50">
+            </div>
+            </div>
+            <div class="col-8">
+            <div class="col-12 d-flex justify-content-between">
+                <p>Producto: <span>${item.name_dish}</span></p>
+                <p>Precio: <span>${new Intl.NumberFormat("es-PE",{style: "currency", currency: "PEN"}).format(item.price_dish)}</span></p>
+            </div>
+            <p>Descripción: <span>${item.description_dish}</span></p>
+            <p>Comentario: <span>${item.comment_dish}</span></p>
+            </div>
+        </div>`;
+        });
+        modal_detail_order.show();
+        select('#modal-detail-order h3 span').textContent=obj_head_sale.id_order;
+        select('#modal-detail-order p').textContent=obj_head_sale.datetime_order;
+        select('#modal-detail-order h2 span').textContent=obj_head_sale.total_order;
+        select('#modal-detail-order #order-name-client').textContent=obj_head_sale.name_client;
+        select('#modal-detail-order #order-phone-client').textContent=obj_head_sale.phone_client;
+        select('#modal-detail-order #order-address-client').textContent=obj_head_sale.address_client;
+        select('#modal-detail-order #order-reference-client').textContent=obj_head_sale.reference_address_client; 
+        select('#modal-detail-order .modal-body #detail-order').innerHTML=codeHtmlModal;
+      }else{
+        Swal.fire({
+          title:'Error',
+          text:'Este pedido no tiene platos solicitados',
+          icon:'error'
+        });
       }
     }
     xhr.send(`code_order=${code}`);
@@ -751,6 +757,121 @@ const showDetailOrderPage=code=>{
         xhr.send('action=logout');
       });
     } catch (e) {console.error(e.message);}
-  })
+
+    try {
+      on('submit','#formUpdateUser',function(e){
+        e.preventDefault();
+        let xhr=new XMLHttpRequest();
+        xhr.open('POST','http://localhost/RestaurantAdmin/assets/vendor/access-data/db-server-app.php');
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded")
+        xhr.onload = () => {
+          if(xhr.status===200){
+            let response=xhr.responseText;
+            if(response!=""||response!=null){
+              switch (parseInt(response)) {
+                case 0: 
+                  Swal.fire({
+                    title: "Error",
+                    text: "No se puedo actualizar tus datos, Intentalo más tarde",
+                    icon: "error"
+                  }); break;
+                case 1: 
+                  Swal.fire({
+                    title: "Correcto",
+                    text: "Datos Actualizados",
+                    icon: "success",
+                    confirmButtonText: "OK",
+                    confirmButtonColor:'#0dcaf0',
+                    allowOutsideClick: false
+                  }).then((result)=>{
+                    if(result.isConfirmed){
+                      window.location.replace("http://localhost/RestaurantAdmin/profile.php");
+                    }
+                  }); break;
+                default: 
+                  Swal.fire({
+                    title: "Error",
+                    icon: "error"
+                  }); break;
+              }
+            }
+          }else{
+            Swal.fire({
+              title: "Error",
+              icon: "error"
+            });
+          }
+        }
+        xhr.send(`type=update&firstName=${select('#formUpdateUser #firstName').value}&lastName=${select('#formUpdateUser #lastName').value}&email=${select('#formUpdateUser #email').value}`);
+      });
+    } catch (e) { console.error(e.message); }
+
+    try {
+      on('submit','#formUpdatePassUser',function(e){
+        e.preventDefault();
+        let xhr=new XMLHttpRequest();
+        xhr.open('POST','http://localhost/RestaurantAdmin/assets/vendor/access-data/db-server-app.php');
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded")
+        xhr.onload = () => {
+          if(xhr.status===200){
+            let response=xhr.responseText;
+            if(response!=""||response!=null){
+              switch (parseInt(response)) {
+                case 0: 
+                  Swal.fire({
+                    title: "Error",
+                    text: "Ingrese su contraseña actual y la nueva",
+                    icon: "error"
+                  }); break;
+                case 1: 
+                  Swal.fire({
+                    title: "Error",
+                    text: "Tu contraseña actual es incorrecta.",
+                    icon: "error"
+                  }); break;
+                case 2: 
+                  Swal.fire({
+                    title: "Error",
+                    text: "La nueva contraseña y su confirmación no coinciden.",
+                    icon: "error"
+                  }); break;
+                case 3: 
+                  Swal.fire({
+                    title: "Error",
+                    text: "No se puedo actualizar tu contraseña, Intentalo más tarde",
+                    icon: "error"
+                  }); break;
+                case 4:
+                  Swal.fire({
+                    title: "Correcto",
+                    text: "Contraseña Actualizada",
+                    icon: "success",
+                    confirmButtonText: "OK",
+                    confirmButtonColor:'#0dcaf0',
+                    allowOutsideClick: false
+                  }).then((result)=>{
+                    if(result.isConfirmed){
+                      window.location.replace("http://localhost/RestaurantAdmin/");
+                    }
+                  }); break;
+                default: 
+                  Swal.fire({
+                    title: "Error",
+                    icon: "error"
+                  }); break;
+              }
+            }
+          }else{
+            Swal.fire({
+              title: "Error",
+              icon: "error"
+            });
+          }
+        }
+        xhr.send(`type=uptpass&pass=${select('#formUpdatePassUser #currentPassword').value}&newpass=${select('#formUpdatePassUser #newPassword').value}&renewpass=${select('#formUpdatePassUser #renewPassword').value}`);
+      });
+    } catch (e) { console.error(e.message); }
+
+  });
 
 })();
