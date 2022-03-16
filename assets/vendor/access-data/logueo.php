@@ -2,18 +2,11 @@
     error_reporting(0);
     session_start();
 
-    function cnx_db_restaurant(){
-        $servidor='mysql:host=localhost;dbname=restaurant';
-        $user='root';
-        $password='';
-
-        try{
-            $pdo=new PDO($servidor, $user, $password);	
-            return $pdo;
-        }catch(PDOException $e){
-            print '¡Error!: ' . $e->getMessage() . "<br/>";
-            die();
-        }
+    if(file_exists('../config/dbconnection.php')){
+      include ('../config/dbconnection.php' );
+      echo 1;
+    }else{
+      die();
     }
 
     function AccessLogin(){
@@ -21,7 +14,7 @@
         $user=htmlentities(addslashes($_POST['username']));
         $password=htmlentities(addslashes($_POST['password']));
         $contador=0;
-        $sql="SELECT e.id_employee, e.password_employee, e.name_employee, e.lastname_employee, e.id_position, p.name_position, e.status_employee, e.email_employee FROM employee_restaurant e join position_restaurant p on e.id_position=p.id_position WHERE e.username_employee=:user";
+        $sql="SELECT e.id_employee, e.password_employee, e.name_employee, e.lastname_employee, e.id_position, p.name_position, e.status_employee, e.email_employee FROM employee e join position_employee p on e.id_position=p.id_position WHERE e.username_employee=:user";
         $result=$pdo->prepare($sql);
         $result->execute(array(":user"=>$user));
         while ($row=$result->fetch(PDO::FETCH_ASSOC)) {

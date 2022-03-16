@@ -17,25 +17,17 @@
         $_SESSION['timesession']=time();
     }
     header('Content-type: application/json; charset=utf-8');
-    function cnx_db_restaurant(){
-        $servidor='mysql:host=localhost;dbname=restaurant';
-        $user='root';
-        $password='';
-
-        try{
-            $pdo=new PDO($servidor, $user, $password);	
-            return $pdo;
-        }catch(PDOException $e){
-            print '¡Error!: ' . $e->getMessage() . "<br/>";
-            die();
-        }
-    }
-
+    
+    if(file_exists('../config/dbconnection.php')){
+        include ('../config/dbconnection.php' );
+      }else{
+        die();
+      }
    
     function AllOrders(){
         $pdo=cnx_db_restaurant();
         $date=date("Y-m-d");
-        $query="SELECT o.id_order, c.name_client, c.phone_client, c.address_client, c.reference_address_client, o.datetime_order, o.total_order, o.status_order FROM order_restaurant o JOIN client_restaurant c on o.id_client=c.id_client WHERE DATE(datetime_order)='$date' ORDER BY o.status_order ASC";
+        $query="SELECT o.id_order, c.name_client, c.phone_client, o.address_order, o.reference_address_order, o.datetime_order, o.total_order, o.status_order, o.type_order  FROM orders o JOIN client c on o.id_client=c.id_client WHERE DATE(o.datetime_order)='$date' ORDER BY o.status_order ASC";
         $resul=$pdo->prepare($query);
         $resul->execute();
         $data=$resul->fetchAll(PDO::FETCH_ASSOC);
@@ -49,16 +41,16 @@
         $query="";
         if($type!=null||$type!=""){
             if($type=="today"){
-                $query="SELECT o.id_order, c.name_client, c.phone_client, c.address_client, c.reference_address_client, o.datetime_order, o.total_order FROM order_restaurant o JOIN client_restaurant c on o.id_client=c.id_client WHERE o.status_order=1 and DATE(datetime_order)='$date'";
+                $query="SELECT o.id_order, c.name_client, c.phone_client, o.address_order, o.reference_address_order, o.datetime_order, o.total_order, o.type_order FROM orders o JOIN client c on o.id_client=c.id_client WHERE o.status_order=1 and DATE(o.datetime_order)='$date'";
             }else if($type=="month"){
                 $date=date("m");
-                $query="SELECT o.id_order, c.name_client, c.phone_client, c.address_client, c.reference_address_client, o.datetime_order, o.total_order FROM order_restaurant o JOIN client_restaurant c on o.id_client=c.id_client WHERE o.status_order=1 and MONTH(datetime_order)=$date";
+                $query="SELECT o.id_order, c.name_client, c.phone_client, o.address_order, o.reference_address_order, o.datetime_order, o.total_order, o.type_order FROM orders o JOIN client c on o.id_client=c.id_client WHERE o.status_order=1 and MONTH(o.datetime_order)=$date";
             }else if($type=="year"){
                 $date=date("Y");
-                $query="SELECT o.id_order, c.name_client, c.phone_client, c.address_client, c.reference_address_client, o.datetime_order, o.total_order FROM order_restaurant o JOIN client_restaurant c on o.id_client=c.id_client WHERE o.status_order=1 and YEAR(datetime_order)=$date";
+                $query="SELECT o.id_order, c.name_client, c.phone_client, o.address_order, o.reference_address_order, o.datetime_order, o.total_order, o.type_order FROM orders o JOIN client c on o.id_client=c.id_client WHERE o.status_order=1 and YEAR(o.datetime_order)=$date";
             }else{
                 $date=$type;
-                $query="SELECT o.id_order, c.name_client, c.phone_client, c.address_client, c.reference_address_client, o.datetime_order, o.total_order FROM order_restaurant o JOIN client_restaurant c on o.id_client=c.id_client WHERE o.status_order=1 and DATE(datetime_order)='$date'";
+                $query="SELECT o.id_order, c.name_client, c.phone_client, o.address_order, o.reference_address_order, o.datetime_order, o.total_order, o.type_order FROM orders o JOIN client c on o.id_client=c.id_client WHERE o.status_order=1 and DATE(o.datetime_order)='$date'";
             }
             $pdo=cnx_db_restaurant();
             $resul=$pdo->prepare($query);
@@ -77,16 +69,16 @@
         $query="";
         if($type!=null||$type!=""){
             if($type=="today"){
-                $query="SELECT o.id_order, c.name_client, c.phone_client, c.address_client, c.reference_address_client, o.datetime_order, o.total_order, o.status_order FROM order_restaurant o JOIN client_restaurant c on o.id_client=c.id_client WHERE DATE(datetime_order)='$date'";
+                $query="SELECT o.id_order, c.name_client, c.phone_client, o.address_order, o.reference_address_order, o.datetime_order, o.total_order, o.status_order, o.type_order FROM orders o JOIN client c on o.id_client=c.id_client WHERE DATE(o.datetime_order)='$date'";
             }else if($type=="month"){
                 $date=date("m");
-                $query="SELECT o.id_order, c.name_client, c.phone_client, c.address_client, c.reference_address_client, o.datetime_order, o.total_order, o.status_order FROM order_restaurant o JOIN client_restaurant c on o.id_client=c.id_client WHERE MONTH(datetime_order)=$date";
+                $query="SELECT o.id_order, c.name_client, c.phone_client, o.address_order, o.reference_address_order, o.datetime_order, o.total_order, o.status_order, o.type_order FROM orders o JOIN client c on o.id_client=c.id_client WHERE MONTH(o.datetime_order)=$date";
             }else if($type=="year"){
                 $date=date("Y");
-                $query="SELECT o.id_order, c.name_client, c.phone_client, c.address_client, c.reference_address_client, o.datetime_order, o.total_order, o.status_order FROM order_restaurant o JOIN client_restaurant c on o.id_client=c.id_client WHERE YEAR(datetime_order)=$date";
+                $query="SELECT o.id_order, c.name_client, c.phone_client, o.address_order, o.reference_address_order, o.datetime_order, o.total_order, o.status_order, o.type_order FROM orders o JOIN client c on o.id_client=c.id_client WHERE YEAR(o.datetime_order)=$date";
             }else{
                 $date=$type;
-                $query="SELECT o.id_order, c.name_client, c.phone_client, c.address_client, c.reference_address_client, o.datetime_order, o.total_order, o.status_order FROM order_restaurant o JOIN client_restaurant c on o.id_client=c.id_client WHERE DATE(datetime_order)='$date'";
+                $query="SELECT o.id_order, c.name_client, c.phone_client, o.address_order, o.reference_address_order, o.datetime_order, o.total_order, o.status_order, o.type_order FROM orders o JOIN client c on o.id_client=c.id_client WHERE DATE(o.datetime_order)='$date'";
             }
             $pdo=cnx_db_restaurant();
             $resul=$pdo->prepare($query);
@@ -102,7 +94,7 @@
     
     function SearchUser($code){
         $pdo=cnx_db_restaurant();
-        $query="SELECT name_employee, lastname_employee, email_employee, id_position  FROM employee_restaurant WHERE id_employee = $code";
+        $query="SELECT name_employee, lastname_employee, email_employee, id_position  FROM employee WHERE id_employee = $code";
         $resul=$pdo->prepare($query);
         $resul->execute();
         $data=$resul->fetchAll(PDO::FETCH_ASSOC);
@@ -118,14 +110,14 @@
         $code=$_SESSION['user'];
         $flag=0;
         $pdo=cnx_db_restaurant();
-        $sql="update employee_restaurant set name_employee='$nam', lastname_employee='$last', email_employee='$mail' where id_employee=$code";
+        $sql="update employee set name_employee='$nam', lastname_employee='$last', email_employee='$mail' where id_employee=$code";
         $result=$pdo->prepare($sql);
         $flag=$result->execute();
         if($flag==1){
             $pdo=null;
             $pdo=cnx_db_restaurant();
             $contador=0;
-            $sql="SELECT name_employee, lastname_employee, email_employee FROM employee_restaurant WHERE id_employee=:user";
+            $sql="SELECT name_employee, lastname_employee, email_employee FROM employee WHERE id_employee=:user";
             $result=$pdo->prepare($sql);
             $result->execute(array(":user"=>$code));
             while ($row=$result->fetch(PDO::FETCH_ASSOC)) {
@@ -143,7 +135,7 @@
         $pdo=cnx_db_restaurant();
         $contador=0;
         $hash="";
-        $sql="SELECT password_employee FROM employee_restaurant WHERE id_employee=:user";
+        $sql="SELECT password_employee FROM employee WHERE id_employee=:user";
         $result=$pdo->prepare($sql);
         $result->execute(array(":user"=>$user));
         while ($row=$result->fetch(PDO::FETCH_ASSOC)) {
@@ -170,7 +162,7 @@
                     $nam=password_hash($newpassword,PASSWORD_DEFAULT);
                     $flag=0;
                     $pdo=cnx_db_restaurant();
-                    $sql="update employee_restaurant set password_employee='$nam' where id_employee=$user";
+                    $sql="update employee set password_employee='$nam' where id_employee=$user";
                     $result=$pdo->prepare($sql);
                     $flag=$result->execute();
                     if($flag==1){

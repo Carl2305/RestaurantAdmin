@@ -73,9 +73,10 @@ const showDetailOrder = code => {
               name_client: item.name_client,
               phone_client: item.phone_client,
               total_order: new Intl.NumberFormat("es-PE",{style: "currency", currency: "PEN"}).format(item.total_order),
-              address_client: item.address_client,
-              reference_address_client: item.reference_address_client,
-              status_order: item.status_order
+              address_client: item.address_order,
+              reference_address_client: item.reference_address_order,
+              status_order: item.status_order,
+              type: item.type_order
             };
           }
         });
@@ -113,7 +114,8 @@ const showDetailOrder = code => {
 
         select('#modal-detail-order .modal-body #detail-order').innerHTML=codeHtmlModal;
         
-        if(obj_head_order.status_order>0){
+
+        if(obj_head_order.status_order>0||obj_head_order.type==0){
           select('#modal-detail-order .modal-footer #btn-check-order').classList.add('d-none');
         }else{
           select('#modal-detail-order .modal-footer #btn-check-order').classList.remove('d-none');
@@ -231,23 +233,31 @@ const loadDataServerPageHome = () => {
           
           data_orders_all.forEach(function(item,index){
             let status="";
+            let type="";
             let buttons="";
+            if(item.type_order==0){
+              type='<p class="text-center"><span class="badge bg-secondary">Local</span></p>';
+            }else if(item.type_order==1){
+              type='<p class="text-center"><span class="badge bg-info">Delivery</span></p>';
+            }
             if(item.status_order==0){
               status='<p class="text-center"><span class="badge bg-warning">Pendiente</span></p>';
               buttons=`<div class="d-flex justify-content-center">
               <div class="btn-group" role="group" >
                 <button class="btn btn-sm btn-primary" title="Ver detalle de la Orden" onclick="showDetailOrder(${item.id_order})"><i class="bi bi-eye"></i></button>`;
-                if(isMobile()){
-                  buttons+=`<a class="btn btn-sm btn-success" title="Llamar para Confirmar Orden" href="tel:+51${item.phone_client}"><i class="bi bi-telephone-outbound"></i></a>
-                  <button class="btn btn-sm btn-secondary" title="Marcar como enviada" onclick="markOrder(${item.id_order},'check')"><i class="bi bi-check2-all"></i></button>
-                  <button class="btn btn-sm btn-danger btn-cancel-order" title="Marcar como cancelado" onclick="markOrder(${item.id_order},'cancel')"><i class="bi bi-x-circle"></i></button> 
-                  </div>
-                </div>`;
-                }else{
-                  buttons+=`<button class="btn btn-sm btn-secondary" title="Marcar como enviada" onclick="markOrder(${item.id_order},'check')"><i class="bi bi-check2-all"></i></button>
-                  <button class="btn btn-sm btn-danger btn-cancel-order" title="Marcar como cancelado" onclick="markOrder(${item.id_order},'cancel')"><i class="bi bi-x-circle"></i></button> 
-                  </div>
-                </div>`;
+                if(item.type_order==1){
+                  if(isMobile()){
+                    buttons+=`<a class="btn btn-sm btn-success" title="Llamar para Confirmar Orden" href="tel:+51${item.phone_client}"><i class="bi bi-telephone-outbound"></i></a>
+                    <button class="btn btn-sm btn-secondary" title="Marcar como enviada" onclick="markOrder(${item.id_order},'check')"><i class="bi bi-check2-all"></i></button>
+                    <button class="btn btn-sm btn-danger btn-cancel-order" title="Marcar como cancelado" onclick="markOrder(${item.id_order},'cancel')"><i class="bi bi-x-circle"></i></button> 
+                    </div>
+                  </div>`;
+                  }else{
+                    buttons+=`<button class="btn btn-sm btn-secondary" title="Marcar como enviada" onclick="markOrder(${item.id_order},'check')"><i class="bi bi-check2-all"></i></button>
+                    <button class="btn btn-sm btn-danger btn-cancel-order" title="Marcar como cancelado" onclick="markOrder(${item.id_order},'cancel')"><i class="bi bi-x-circle"></i></button> 
+                    </div>
+                  </div>`;
+                  }
                 }
                 
               pending_orders_today++;
@@ -259,7 +269,7 @@ const loadDataServerPageHome = () => {
               </div>
             </div>`;
               total_sales++;
-              total_sales_today+=item.total_order;
+              total_sales_today+=parseFloat(item.total_order);
               dispatched_orders_today++;
             }else{
               status='<p class="text-center"><span class="badge bg-danger">Cancelado</span></p>';
@@ -275,9 +285,10 @@ const loadDataServerPageHome = () => {
               item.name_client,
               item.phone_client,
               item.datetime_order,
-              //`<p class="text-end">${new Intl.NumberFormat("es-PE",{style: "currency", currency: "PEN"}).format(item.total_order)}</p>`,
-              `<p class="text-end">${item.total_order}0</p>`,
+              `<p class="text-end">${new Intl.NumberFormat("es-PE",{style: "currency", currency: "PEN"}).format(item.total_order)}</p>`,
+              //`<p class="text-end">${item.total_order}0</p>`,
               status,
+              type,
               buttons
             ]);
 
@@ -298,7 +309,7 @@ const loadDataServerPageHome = () => {
             paging: true,
             perPageSelect: [5, 10, 15, 20, 25, 50, 100],
             data:{
-              headings: ['#','Cliente','Telf. Cliente','Día y Hora Solicitado','Total S/','Estado','Opciones'],
+              headings: ['#','Cliente','Telf. Cliente','Día y Hora Solicitado','Total','Estado','Tipo','Opciones'],
               data: arrayNew,
             }
           });
@@ -327,7 +338,7 @@ const loadDataServerPageHome = () => {
             paging: true,
             perPageSelect: [5, 10, 15, 20, 25, 50, 100],
             data:{
-              headings: ['#','Cliente','Telf. Cliente','Día y Hora Solicitado','Total S/','Estado','Opciones'],
+              headings: ['#','Cliente','Telf. Cliente','Día y Hora Solicitado','Total','Estado','Tipo','Opciones'],
               data: [],
             }
           });
@@ -364,17 +375,24 @@ const loadDataServerPageHome = () => {
          let response=xhr.responseText;
          if(JSON.parse(response).length>0){
            data_sales_type=JSON.parse(response);
+           let type="";
            let total_sales_today=0.0;
            let arrayNew=[];
            data_sales_type.forEach(function(item,index){
-             total_sales_today+=item.total_order;
+             total_sales_today+=parseFloat(item.total_order);
+             if(item.type_order==0){
+              type='<p class="text-center"><span class="badge bg-secondary">Local</span></p>';
+            }else if(item.type_order==1){
+              type='<p class="text-center"><span class="badge bg-info">Delivery</span></p>';
+            }
              arrayNew.push([
                item.id_order,
                item.name_client,
                item.phone_client,
                item.datetime_order,
-               //`<p class="text-end">${new Intl.NumberFormat("es-PE",{style: "currency", currency: "PEN"}).format(item.total_order)}</p>`,
-               `<p class="text-end">${item.total_order}0</p>`,
+               `<p class="text-end">${new Intl.NumberFormat("es-PE",{style: "currency", currency: "PEN"}).format(item.total_order)}</p>`,
+               //`<p class="text-end">${item.total_order}0</p>`,
+               type,
                `<div class="d-flex justify-content-center">
                    <div class="btn-group d-flex justify-content-center" role="group" >
                    <button class="btn btn-sm btn-primary" title="Ver detalle de la Venta" onclick="showDetailSale(${item.id_order})"><i class="bi bi-eye"></i></button>
@@ -382,6 +400,7 @@ const loadDataServerPageHome = () => {
                </div>`
              ]);
            });
+           
            try{
              dataTableSale.destroy();
            }catch{}
@@ -396,7 +415,7 @@ const loadDataServerPageHome = () => {
                paging: true,
                perPageSelect: [5, 10, 15, 20, 25, 50, 100],
                data:{
-                 headings: ['#','Cliente','Telf. Cliente','Día y Hora Solicitado','Total S/','Opciones'],
+                 headings: ['#','Cliente','Telf. Cliente','Día y Hora Solicitado','Total','Tipo','Opciones'],
                  data: arrayNew,
                }
            });
@@ -417,7 +436,7 @@ const loadDataServerPageHome = () => {
                paging: true,
                perPageSelect: [5, 10, 15, 20, 25, 50, 100],
                data:{
-                 headings: ['#','Cliente','Telf. Cliente','Día y Hora Solicitado','Total S/','Opciones'],
+                 headings: ['#','Cliente','Telf. Cliente','Día y Hora Solicitado','Total','Tipo','Opciones'],
                  data: [],
                }
            });
@@ -446,8 +465,8 @@ const loadDataServerPageHome = () => {
               name_client: item.name_client,
               phone_client: item.phone_client,
               total_order: new Intl.NumberFormat("es-PE",{style: "currency", currency: "PEN"}).format(item.total_order),
-              address_client: item.address_client,
-              reference_address_client: item.reference_address_client,
+              address_client: item.address_order,
+              reference_address_client: item.reference_address_order,
               status_order: item.status_order
             };
           }
@@ -518,6 +537,12 @@ const loadDataServerPageOrders=(type="today")=>{
           let arrayNew=[];
           data_orders_orders.forEach(function(item,index){
             let status="";
+            let type="";
+            if(item.type_order==0){
+              type='<p class="text-center"><span class="badge bg-secondary">Local</span></p>';
+            }else if(item.type_order==1){
+              type='<p class="text-center"><span class="badge bg-info">Delivery</span></p>';
+            }
             if(item.status_order==0){
               status='<p class="text-center"><span class="badge bg-warning">Pendiente</span></p>';
               pending_orders++;
@@ -533,9 +558,10 @@ const loadDataServerPageOrders=(type="today")=>{
               item.name_client,
               item.phone_client,
               item.datetime_order,
-              //`<p class="text-end">${new Intl.NumberFormat("es-PE",{style: "currency", currency: "PEN"}).format(item.total_order)}</p>`,
-              `<p class="text-end">${item.total_order}0</p>`,
+              `<p class="text-end">${new Intl.NumberFormat("es-PE",{style: "currency", currency: "PEN"}).format(item.total_order)}</p>`,
+              //`<p class="text-end">${item.total_order}0</p>`,
               status,
+              type,
               `<div class="d-flex justify-content-center">
                   <div class="btn-group d-flex justify-content-center" role="group" >
                   <button class="btn btn-sm btn-primary" title="Ver detalle de la Venta" onclick="showDetailOrderPage(${item.id_order})"><i class="bi bi-eye"></i></button>
@@ -557,7 +583,7 @@ const loadDataServerPageOrders=(type="today")=>{
             paging: true,
             perPageSelect: [5, 10, 15, 20, 25, 50, 100],
             data:{
-              headings: ['#','Cliente','Telf. Cliente','Día y Hora Solicitado','Total S/','Estado','Opciones'],
+              headings: ['#','Cliente','Telf. Cliente','Día y Hora Solicitado','Total','Estado','Tipo','Opciones'],
               data: arrayNew,
             }
           });
@@ -580,7 +606,7 @@ const loadDataServerPageOrders=(type="today")=>{
             paging: true,
             perPageSelect: [5, 10, 15, 20, 25, 50, 100],
             data:{
-              headings: ['#','Cliente','Telf. Cliente','Día y Hora Solicitado','Total S/','Estado','Opciones'],
+              headings: ['#','Cliente','Telf. Cliente','Día y Hora Solicitado','Total','Estado','Tipo','Opciones'],
               data: [],
             }
           });
@@ -612,8 +638,8 @@ const showDetailOrderPage=code=>{
               name_client: item.name_client,
               phone_client: item.phone_client,
               total_order: new Intl.NumberFormat("es-PE",{style: "currency", currency: "PEN"}).format(item.total_order),
-              address_client: item.address_client,
-              reference_address_client: item.reference_address_client,
+              address_client: item.address_order,
+              reference_address_client: item.reference_address_order,
               status_order: item.status_order
             };
           }
@@ -809,66 +835,74 @@ const showDetailOrderPage=code=>{
     try {
       on('submit','#formUpdatePassUser',function(e){
         e.preventDefault();
-        let xhr=new XMLHttpRequest();
-        xhr.open('POST','http://localhost/RestaurantAdmin/assets/vendor/access-data/db-server-app.php');
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded")
-        xhr.onload = () => {
-          if(xhr.status===200){
-            let response=xhr.responseText;
-            if(response!=""||response!=null){
-              switch (parseInt(response)) {
-                case 0: 
-                  Swal.fire({
-                    title: "Error",
-                    text: "Ingrese su contraseña actual y la nueva",
-                    icon: "error"
-                  }); break;
-                case 1: 
-                  Swal.fire({
-                    title: "Error",
-                    text: "Tu contraseña actual es incorrecta.",
-                    icon: "error"
-                  }); break;
-                case 2: 
-                  Swal.fire({
-                    title: "Error",
-                    text: "La nueva contraseña y su confirmación no coinciden.",
-                    icon: "error"
-                  }); break;
-                case 3: 
-                  Swal.fire({
-                    title: "Error",
-                    text: "No se puedo actualizar tu contraseña, Intentalo más tarde",
-                    icon: "error"
-                  }); break;
-                case 4:
-                  Swal.fire({
-                    title: "Correcto",
-                    text: "Contraseña Actualizada",
-                    icon: "success",
-                    confirmButtonText: "OK",
-                    confirmButtonColor:'#0dcaf0',
-                    allowOutsideClick: false
-                  }).then((result)=>{
-                    if(result.isConfirmed){
-                      window.location.replace("http://localhost/RestaurantAdmin/");
-                    }
-                  }); break;
-                default: 
-                  Swal.fire({
-                    title: "Error",
-                    icon: "error"
-                  }); break;
+        if(select('#formUpdatePassUser #newPassword').value==select('#formUpdatePassUser #renewPassword').value){
+          let xhr=new XMLHttpRequest();
+          xhr.open('POST','http://localhost/RestaurantAdmin/assets/vendor/access-data/db-server-app.php');
+          xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded")
+          xhr.onload = () => {
+            if(xhr.status===200){
+              let response=xhr.responseText;
+              if(response!=""||response!=null){
+                switch (parseInt(response)) {
+                  case 0: 
+                    Swal.fire({
+                      title: "Error",
+                      text: "Ingrese su contraseña actual y la nueva",
+                      icon: "error"
+                    }); break;
+                  case 1: 
+                    Swal.fire({
+                      title: "Error",
+                      text: "Tu contraseña actual es incorrecta.",
+                      icon: "error"
+                    }); break;
+                  case 2: 
+                    Swal.fire({
+                      title: "Error",
+                      text: "La nueva contraseña y su confirmación no coinciden.",
+                      icon: "error"
+                    }); break;
+                  case 3: 
+                    Swal.fire({
+                      title: "Error",
+                      text: "No se puedo actualizar tu contraseña, Intentalo más tarde",
+                      icon: "error"
+                    }); break;
+                  case 4:
+                    Swal.fire({
+                      title: "Correcto",
+                      text: "Contraseña Actualizada",
+                      icon: "success",
+                      confirmButtonText: "OK",
+                      confirmButtonColor:'#0dcaf0',
+                      allowOutsideClick: false
+                    }).then((result)=>{
+                      if(result.isConfirmed){
+                        window.location.replace("http://localhost/RestaurantAdmin/");
+                      }
+                    }); break;
+                  default: 
+                    Swal.fire({
+                      title: "Error",
+                      icon: "error"
+                    }); break;
+                }
               }
+            }else{
+              Swal.fire({
+                title: "Error",
+                icon: "error"
+              });
             }
-          }else{
-            Swal.fire({
-              title: "Error",
-              icon: "error"
-            });
           }
-        }
-        xhr.send(`type=uptpass&pass=${select('#formUpdatePassUser #currentPassword').value}&newpass=${select('#formUpdatePassUser #newPassword').value}&renewpass=${select('#formUpdatePassUser #renewPassword').value}`);
+          xhr.send(`type=uptpass&pass=${select('#formUpdatePassUser #currentPassword').value}&newpass=${select('#formUpdatePassUser #newPassword').value}&renewpass=${select('#formUpdatePassUser #renewPassword').value}`);
+        }else{
+          Swal.fire({
+            title: "Error",
+            text: "La nueva contraseña y su confirmación no coinciden.",
+            icon: "error"
+          });
+        }        
       });
     } catch (e) { console.error(e.message); }
 

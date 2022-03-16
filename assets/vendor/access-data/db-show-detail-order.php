@@ -1,4 +1,5 @@
 <?php
+    error_reporting(0);
     session_start();
     $varsesion=$_SESSION['login'];
     if($varsesion==null||$varsesion==''||$varsesion!=true){
@@ -16,24 +17,16 @@
         $_SESSION['timesession']=time();
     }
     header('Content-type: application/json; charset=utf-8');
-    function cnx_db_restaurant(){
-        $servidor='mysql:host=localhost;dbname=restaurant';
-        $user='root';
-        $password='';
-
-        try{
-            $pdo=new PDO($servidor, $user, $password);	
-            return $pdo;
-        }catch(PDOException $e){
-            print '¡Error!: ' . $e->getMessage() . "<br/>";
-            die();
-        }
-    }
-
+    
+    if(file_exists('../config/dbconnection.php')){
+        include ('../config/dbconnection.php' );
+      }else{
+        die();
+      }
    
     function ShowDetailOrder($code){
         $pdo=cnx_db_restaurant();
-        $query="SELECT code_dish, name_dish, description_dish, url_image_dish, price_dish, amount_dish, comment_dish FROM order_detail_restaurant WHERE id_order=$code";
+        $query="SELECT d.code_dish, d.name_dish, d.description_dish, d.url_image_dish, d.price_dish, o.amount_dish, o.comment_dish FROM order_detail o join dish d on o.id_dish=d.id_dish WHERE o.id_order=$code";
         $resul=$pdo->prepare($query);
         $resul->execute();
         $data=$resul->fetchAll(PDO::FETCH_ASSOC);

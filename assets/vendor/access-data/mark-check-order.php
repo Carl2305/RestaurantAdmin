@@ -16,26 +16,19 @@
         $_SESSION['timesession']=time();
     }
     header('Content-type: application/json; charset=utf-8');
-    function cnx_db_restaurant(){
-        $servidor='mysql:host=localhost;dbname=restaurant';
-        $user='root';
-        $password='';
-
-        try{
-            $pdo=new PDO($servidor, $user, $password);	
-            return $pdo;
-        }catch(PDOException $e){
-            print '¡Error!: ' . $e->getMessage() . "<br/>";
-            die();
-        }
-    }
+    
+    if(file_exists('../config/dbconnection.php')){
+        include ('../config/dbconnection.php' );
+      }else{
+        die();
+      }
 
     function ValidatePassword(){
         $pdo=cnx_db_restaurant();
         $user=$_SESSION['user'];
         $contador=0;
         $hash="";
-        $sql="SELECT password_employee FROM employee_restaurant WHERE id_employee=:user";
+        $sql="SELECT password_employee FROM employee WHERE id_employee=:user";
         $result=$pdo->prepare($sql);
         $result->execute(array(":user"=>$user));
         while ($row=$result->fetch(PDO::FETCH_ASSOC)) {
@@ -68,7 +61,7 @@
 
     function updateStatusCheckOrder($idUser,$idOrder){
         $pdo=cnx_db_restaurant();
-        $query="update order_restaurant set id_employee=$idUser, status_order=1 WHERE id_order=$idOrder";
+        $query="update orders set id_employee=$idUser, status_order=1 WHERE id_order=$idOrder";
         $resul=$pdo->prepare($query);
         $flag=$resul->execute();
         if($flag==1){
@@ -82,7 +75,7 @@
 
     function updateStatusCancelOrder($idUser,$idOrder){
         $pdo=cnx_db_restaurant();
-        $query="update order_restaurant set id_employee=$idUser, status_order=2 WHERE id_order=$idOrder";
+        $query="update orders set id_employee=$idUser, status_order=2 WHERE id_order=$idOrder";
         $resul=$pdo->prepare($query);
         $flag=$resul->execute();
         if($flag==1){
