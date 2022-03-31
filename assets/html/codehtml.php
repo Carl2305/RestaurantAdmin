@@ -94,6 +94,7 @@
     // L-PROFILE: profile.php
     // L-REGISTER: register.php
     // L-SALES: sales.php
+    // L-LOCALORDERS: localorders.php
 
     $html='';
     $html.='<aside id="sidebar" class="sidebar">
@@ -107,6 +108,14 @@
             </a>
             </li><!-- End Home Nav -->
 
+            <li class="nav-item">';
+            if ($link=='L-LOCALORDERS') {$html.='<a class="nav-link " href="localorders.php">';}
+            else{$html.='<a class="nav-link collapsed" href="localorders.php">';}
+            $html.='<i class="bx bx-bowl-hot"></i>
+                <span>O. Local</span>
+            </a>
+            </li><!-- End Orders Nav -->
+            
             <li class="nav-item">';
             if ($link=='L-ORDERS') {$html.='<a class="nav-link " href="orders.php">';}
             else{$html.='<a class="nav-link collapsed" href="orders.php">';}
@@ -192,7 +201,11 @@
             <div class="modal-footer">
             <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>';
             if($btnconfirm){
-                $html.='<button type="button" class="btn btn-success" id="btn-check-order">Marcar Como Enviado</button>';
+                $html.='<button type="button" class="btn btn-success" id="btn-check-order">Marcar Como Enviado</button>
+                      </div>
+                  </div>
+                  </div>
+              </div>';
             }
             $html.='
             </div>
@@ -310,6 +323,63 @@
           </div>
         </div>
     </div>';
+  }
+
+  function loadModalUpdateDish(){
+    return '<form class="modal fade" id="formupdatedish" tabindex="-1" data-bs-backdrop="static" role="form" action="assets/vendor/"  enctype="multipart/form-data">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header justify-content-between">
+          <h3 class="modal-title">Actualizar Datos de: <span id="name_dish"></span></h3>            
+        </div>
+        <div class="modal-body">
+          <div class="col-12">
+            <div class="row justify-content-center">
+              <div class="col-12 row mb-1">
+                <div class="col-12 col-md-4 mb-3 mb-md-0">
+                  <div class="d-flex justify-content-center">
+                    <img class="w-50">
+                  </div>
+                  <div class="d-flex justify-content-center">
+                    <input type="file" name="uploadimage" id="uploadimage" class="form-control form-control-sm">
+                  </div>
+                </div>
+                <div class="col-12 col-md-8">
+                    <div class="row">
+                      <div class="col-12">
+                        <label for="namedish" class="form-label">Nombre</label>
+                        <input type="text" name="namedish" class="form-control" id="namedish" required minlength="3" maxlength="100" autofocus>
+                      </div>
+                      <div class="col-12 col-md-4">
+                        <label for="pricedish" class="form-label">Precio</label>
+                        <input type="text" name="pricedish" class="form-control" id="pricedish" required minlength="2" maxlength="5" autofocus>
+                      </div>
+                      <div class="col-12 col-md-8">
+                        <label for="category" class="form-label">Categoria</label>
+                        <select id="category" class="form-control" name="category" required>
+                          <option value="1">POLLOS</option>
+                          <option value="2">ENSALADAS</option>
+                          <option value="3">BEBIDAS</option>
+                          <option value="4">COMBOS</option>
+                        </select>
+                      </div>
+                      <div class="col-12">
+                        <label for="descripdish" class="form-label">Descripción</label>
+                        <textarea id="descripdish" class="form-control" name="descripdish" rows="5" maxlength="200"></textarea>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+            <button type="submit" class="btn btn-success" id="btnsendupdatedish">Guardar Cambios</button>
+          </div>
+        </div>
+      </div>
+    </form>';
   }
 
 ?>

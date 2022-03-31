@@ -114,13 +114,14 @@ const showDetailOrder = code => {
 
         select('#modal-detail-order .modal-body #detail-order').innerHTML=codeHtmlModal;
         
+        select('#modal-detail-order #btn-check-order').dataset.ordercheck=obj_head_order.id_order;
 
-        if(obj_head_order.status_order>0||obj_head_order.type==0){
+        /*if(obj_head_order.status_order>0||obj_head_order.type==0){
           select('#modal-detail-order .modal-footer #btn-check-order').classList.add('d-none');
         }else{
           select('#modal-detail-order .modal-footer #btn-check-order').classList.remove('d-none');
           select('#modal-detail-order #btn-check-order').dataset.ordercheck=obj_head_order.id_order;
-        }
+        }*/
       }else{
         Swal.fire({
           title:'Error',
@@ -245,21 +246,18 @@ const loadDataServerPageHome = () => {
               buttons=`<div class="d-flex justify-content-center">
               <div class="btn-group" role="group" >
                 <button class="btn btn-sm btn-primary" title="Ver detalle de la Orden" onclick="showDetailOrder(${item.id_order})"><i class="bi bi-eye"></i></button>`;
-                if(item.type_order==1){
-                  if(isMobile()){
-                    buttons+=`<a class="btn btn-sm btn-success" title="Llamar para Confirmar Orden" href="tel:+51${item.phone_client}"><i class="bi bi-telephone-outbound"></i></a>
-                    <button class="btn btn-sm btn-secondary" title="Marcar como enviada" onclick="markOrder(${item.id_order},'check')"><i class="bi bi-check2-all"></i></button>
-                    <button class="btn btn-sm btn-danger btn-cancel-order" title="Marcar como cancelado" onclick="markOrder(${item.id_order},'cancel')"><i class="bi bi-x-circle"></i></button> 
-                    </div>
-                  </div>`;
-                  }else{
-                    buttons+=`<button class="btn btn-sm btn-secondary" title="Marcar como enviada" onclick="markOrder(${item.id_order},'check')"><i class="bi bi-check2-all"></i></button>
-                    <button class="btn btn-sm btn-danger btn-cancel-order" title="Marcar como cancelado" onclick="markOrder(${item.id_order},'cancel')"><i class="bi bi-x-circle"></i></button> 
-                    </div>
-                  </div>`;
-                  }
-                }
-                
+                if(isMobile()){
+                  buttons+=`<a class="btn btn-sm btn-success" title="Llamar para Confirmar Orden" href="tel:+51${item.phone_client}"><i class="bi bi-telephone-outbound"></i></a>
+                  <button class="btn btn-sm btn-secondary" title="Marcar como enviada" onclick="markOrder(${item.id_order},'check')"><i class="bi bi-check2-all"></i></button>
+                  <button class="btn btn-sm btn-danger btn-cancel-order" title="Marcar como cancelado" onclick="markOrder(${item.id_order},'cancel')"><i class="bi bi-x-circle"></i></button> 
+                  </div>
+                </div>`;
+                }else{
+                  buttons+=`<button class="btn btn-sm btn-secondary" title="Marcar como enviada" onclick="markOrder(${item.id_order},'check')"><i class="bi bi-check2-all"></i></button>
+                  <button class="btn btn-sm btn-danger btn-cancel-order" title="Marcar como cancelado" onclick="markOrder(${item.id_order},'cancel')"><i class="bi bi-x-circle"></i></button> 
+                  </div>
+                </div>`;
+                }                
               pending_orders_today++;
             }else if(item.status_order==1){
               status='<p class="text-center"><span class="badge bg-success">Enviado</span></p>';

@@ -147,7 +147,7 @@
   
                   </div>
   
-                  <div class="tab-pane fade pt-3" id="profile-change-password">
+                  <div class="tab-pane fade profile-edit pt-3" id="profile-change-password">
                     <!-- Change Password Form -->
                     <form role="form" id="formUpdatePassUser" autocomplete="off" method="post">
                       <div class="row mb-3">
